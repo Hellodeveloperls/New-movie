@@ -27,8 +27,8 @@ MELCOW_VID = environ.get("MELCOW_VID", "https://t.me/howtodownloadmoviestamilhd/
 SPELL_IMG = environ.get("SPELL_IMG", "https://te.legra.ph/file/15c1ad448dfe472a5cbb8.jpg")
 
 # Admins, Channels & Users
-ADMINS = [int(admin) if id_pattern.search(admin) else admin for admin in environ.get('ADMINS', '5249356814').split()]
-CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '-1001546889661 -1001924025792 -1001812588767').split()]
+ADMINS = [int(admin) if id_pattern.search(admin) else admin for admin in environ.get('ADMINS', '5249356814 5826767568').split()]
+CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '-1001798426032 -1001812588767 -1002132414127 -1001924025792 -1002212466294').split()]
 auth_users = [int(user) if id_pattern.search(user) else user for user in environ.get('AUTH_USERS', '').split()]
 AUTH_USERS = (auth_users + ADMINS) if auth_users else []
 PREMIUM_USER = [int(user) if id_pattern.search(user) else user for user in environ.get('PREMIUM_USER', '').split()]
@@ -49,19 +49,19 @@ COLLECTION_NAME = environ.get('COLLECTION_NAME', 'mojahidalam8092')
 
 # Others
 VERIFY = bool(environ.get('VERIFY', False))
-SHORTLINK_URL = environ.get('SHORTLINK_URL', 'mklinks.in')
-SHORTLINK_API = environ.get('SHORTLINK_API', '7a303441c79d8055f7980b276074751171062094')
+SHORTLINK_URL = environ.get('SHORTLINK_URL', 'Publicearn.com')
+SHORTLINK_API = environ.get('SHORTLINK_API', 'ef229bfec24561d3ea9475998d2c0204ceac3e87')
 IS_SHORTLINK = bool(environ.get('IS_SHORTLINK', False))
 DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in environ.get('DELETE_CHANNELS', '0').split()]
 MAX_B_TN = environ.get("MAX_B_TN", "5")
 MAX_BTN = is_enabled((environ.get('MAX_BTN', "True")), True)
 PORT = environ.get("PORT", "8080")
-GRP_LNK = environ.get('GRP_LNK', 'https://t.me/+KBAf3X1f2R00NGI1')
-CHNL_LNK = environ.get('CHNL_LNK', 'https://t.me/+KBAf3X1f2R00NGI1')
+GRP_LNK = environ.get('GRP_LNK', 'https://t.me/+sFln_UBbyUI1NWQ1')
+CHNL_LNK = environ.get('CHNL_LNK', 'https://t.me/+lSfC-VniltI1Yjg1')
 TUTORIAL = environ.get('TUTORIAL', 'https://t.me/How_to_download_movies_in_group/6')
 IS_TUTORIAL = bool(environ.get('IS_TUTORIAL', True))
 MSG_ALRT = environ.get('MSG_ALRT', 'Hello My Dear Friends ❤️')
-LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1001898144891'))
+LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1001779106036'))
 SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'SA_bot_discussion')
 P_TTI_SHOW_OFF = is_enabled((environ.get('P_TTI_SHOW_OFF', "False")), False)
 IMDB = is_enabled((environ.get('IMDB', "True")), True)
