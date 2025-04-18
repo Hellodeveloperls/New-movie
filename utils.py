@@ -4,7 +4,7 @@
 
 import logging
 from pyrogram.errors import InputUserDeactivated, UserNotParticipant, FloodWait, UserIsBlocked, PeerIdInvalid
-from info import AUTH_CHANNEL, AUTH_CHANNEL2, LONG_IMDB_DESCRIPTION, MAX_LIST_ELM, SHORTLINK_URL, SHORTLINK_API, IS_SHORTLINK, LOG_CHANNEL, TUTORIAL, GRP_LNK, CHNL_LNK, CUSTOM_FILE_CAPTION
+from info import FORCE_SUB_CHANNEL1, FORCE_SUB_CHANNEL2, LONG_IMDB_DESCRIPTION, MAX_LIST_ELM, SHORTLINK_URL, SHORTLINK_API, IS_SHORTLINK, LOG_CHANNEL, TUTORIAL, GRP_LNK, CHNL_LNK, CUSTOM_FILE_CAPTION
 from imdb import Cinemagoer 
 import asyncio
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
@@ -58,31 +58,37 @@ class temp(object):
     SETTINGS = {}
     IMDB_CAP = {}
 
-async def is_subscribed(bot, query):
+async def is_subscribed1(filter, client, update):
+    if not FORCE_SUB_CHANNEL1:
+        return True
+    user_id = update.from_user.id
+    if user_id in ADMINS:
+        return True
     try:
-        user = await bot.get_chat_member(AUTH_CHANNEL, query.from_user.id)
+        member = await client.get_chat_member(chat_id = FORCE_SUB_CHANNEL1, user_id = user_id)
     except UserNotParticipant:
-        pass
-    except Exception as e:
-        logger.exception(e)
+        return False
+
+    if not member.status in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.MEMBER]:
+        return False
     else:
-        if user.status != enums.ChatMemberStatus.BANNED:
-            return True
+        return True
 
-    return False
-
-async def is_subscribed2(bot, query):
+async def is_subscribed2(filter, client, update):
+    if not FORCE_SUB_CHANNEL2:
+        return True
+    user_id = update.from_user.id
+    if user_id in ADMINS:
+        return True
     try:
-        user = await bot.get_chat_member(AUTH_CHANNEL2, query.from_user.id)
+        member = await client.get_chat_member(chat_id = FORCE_SUB_CHANNEL2, user_id = user_id)
     except UserNotParticipant:
-        pass
-    except Exception as e:
-        logger.exception(e)
-    else:
-        if user.status != enums.ChatMemberStatus.BANNED:
-            return True
+        return False
 
-    return False
+    if not member.status in [ChatMemberStatus.OWNER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.MEMBER]:
+        return False
+    else:
+        return True
 
 
 async def get_poster(query, bulk=False, id=False, file=None):
