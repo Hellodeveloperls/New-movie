@@ -1,109 +1,104 @@
-# Don't Remove Credit @VJ_Botz
-# Subscribe YouTube Channel For Amazing Bot @Tech_VJ
-# Ask Doubt on telegram @KingVJ01
-
-
 from __future__ import unicode_literals
 
-import os, requests, asyncio, math, time, wget
+import os, requests, asyncio, wget
 from pyrogram import filters, Client
 from pyrogram.types import Message
-
 from youtube_search import YoutubeSearch
 from youtubesearchpython import SearchVideos
 from yt_dlp import YoutubeDL
 
+# Text extractor
+def get_text(message: Message) -> [None, str]:
+    if not message.text or " " not in message.text:
+        return None
+    return message.text.split(None, 1)[1]
 
+# Song downloader (/song, /mp3)
 @Client.on_message(filters.command(['song', 'mp3']) & filters.private)
 async def song(client, message):
-    user_id = message.from_user.id 
-    user_name = message.from_user.first_name 
-    rpk = "["+user_name+"](tg://user?id="+str(user_id)+")"
-    query = ''
-    for i in message.command[1:]:
-        query += ' ' + str(i)
-    print(query)
-    m = await message.reply(f"**ѕєαrchíng чσur ѕσng...!\n {query}**")
+    query = get_text(message)
+    if not query:
+        return await message.reply("Example: `/song Vaathi Coming`")
+    
+    m = await message.reply(f"🎧 Searching your song...\n**Query:** `{query}`")
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
         results = YoutubeSearch(query, max_results=1).to_dict()
-        link = f"https://youtube.com{results[0]['url_suffix']}"
-        title = results[0]["title"][:40]       
-        thumbnail = results[0]["thumbnails"][0]
-        thumb_name = f'thumb{title}.jpg'
+        result = results[0]
+        link = f"https://youtube.com{result['url_suffix']}"
+        title = result["title"][:40]
+        thumbnail = result["thumbnails"][0]
+        duration = result["duration"]
+        performer = "VJ NETWORKS™"
+
+        # Save thumbnail
+        thumb_name = f'thumb_{title}.jpg'.replace('/', '_')
         thumb = requests.get(thumbnail, allow_redirects=True)
-        open(thumb_name, 'wb').write(thumb.content)
-        performer = f"[VJ NETWORKS™]" 
-        duration = results[0]["duration"]
-        url_suffix = results[0]["url_suffix"]
-        views = results[0]["views"]
+        with open(thumb_name, 'wb') as f:
+            f.write(thumb.content)
+
     except Exception as e:
-        print(str(e))
-        return await m.edit("Example: /song vaa vaathi song")
-                
-    await m.edit("**dσwnlσαdíng чσur ѕσng...!**")
+        print("Search error:", e)
+        return await m.edit("❌ Failed to find the song.\nTry another query.")
+
+    await m.edit("📥 Downloading your song...")
+
     try:
         with YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(link, download=False)
+            info_dict = ydl.extract_info(link, download=True)
             audio_file = ydl.prepare_filename(info_dict)
-            ydl.process_info(info_dict)
 
-        cap = "**BY›› [SA Bots](https://t.me/SA_Bots)**"
-        secmul, dur, dur_arr = 1, 0, duration.split(':')
-        for i in range(len(dur_arr)-1, -1, -1):
-            dur += (int(dur_arr[i]) * secmul)
+        # Convert duration to seconds
+        secmul, seconds = 1, 0
+        for t in reversed(duration.split(':')):
+            seconds += int(t) * secmul
             secmul *= 60
+
         await message.reply_audio(
-            audio_file,
-            caption=cap,            
-            quote=False,
+            audio=open(audio_file, "rb"),
+            caption="🎶 Powered by [SA Bots](https://t.me/SA_Bots)",
             title=title,
-            duration=dur,
             performer=performer,
+            duration=seconds,
             thumb=thumb_name
-        )            
+        )
         await m.delete()
     except Exception as e:
-        await m.edit("**🚫 𝙴𝚁𝚁𝙾𝚁 🚫**")
-        print(e)
-    try:
-        os.remove(audio_file)
-        os.remove(thumb_name)
-    except Exception as e:
-        print(e)
-
-def get_text(message: Message) -> [None,str]:
-    text_to_return = message.text
-    if message.text is None:
-        return None
-    if " " not in text_to_return:
-        return None
-    try:
-        return message.text.split(None, 1)[1]
-    except IndexError:
-        return None
+        print("Download error:", e)
+        await m.edit("🚫 Error while downloading the song.")
+    
+    # Cleanup
+    for f in (audio_file, thumb_name):
+        if os.path.exists(f):
+            os.remove(f)
 
 
+# Video downloader (/video, /mp4)
 @Client.on_message(filters.command(["video", "mp4"]))
 async def vsong(client, message: Message):
-    urlissed = get_text(message)
-    if not urlissed:
-        return await message.reply("Example: /video Your video link") 
+    query = get_text(message)
+    if not query:
+        return await message.reply("Example: /video your video name or link")
 
-    pablo = await client.send_message(message.chat.id, f"**𝙵𝙸𝙽𝙳𝙸𝙽𝙶 𝚈𝙾𝚄𝚁 𝚅𝙸𝙳𝙴𝙾** `{urlissed}`")
-    
-    search = SearchVideos(f"{urlissed}", offset=1, mode="dict", max_results=1)
-    mi = search.result()
-    mio = mi["search_result"]
-    mo = mio[0]["link"]
-    thum = mio[0]["title"]
-    fridayz = mio[0]["id"]
-    mio[0]["channel"]
-    kekme = f"https://img.youtube.com/vi/{fridayz}/hqdefault.jpg"
-    await asyncio.sleep(0.6)
-    url = mo
-    sedlyf = wget.download(kekme)
-    opts = {
+    info_msg = await message.reply(f"🎬 Searching video: `{query}`")
+    try:
+        search = SearchVideos(query, offset=1, mode="dict", max_results=1)
+        result = search.result()["search_result"][0]
+        video_link = result["link"]
+        video_title = result["title"]
+        video_id = result["id"]
+        thumb_url = f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
+
+        # Save thumbnail
+        thumb_file = wget.download(thumb_url)
+
+    except Exception as e:
+        print("Search error:", e)
+        return await info_msg.edit("❌ Video not found. Try something else.")
+
+    await asyncio.sleep(0.5)
+
+    ydl_opts = {
         "format": "best",
         "addmetadata": True,
         "key": "FFmpegMetadata",
@@ -111,30 +106,32 @@ async def vsong(client, message: Message):
         "geo_bypass": True,
         "nocheckcertificate": True,
         "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}],
-        "outtmpl": "%(id)s.mp4",
-        "logtostderr": False,
+        "outtmpl": "%(id)s.%(ext)s",
         "quiet": True,
     }
-    try:
-        with YoutubeDL(opts) as ytdl:
-            ytdl_data = ytdl.extract_info(url, download=True)
-    except Exception as e:
-        return await pablo.edit_text(f"**𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍 𝙵𝚊𝚒𝚕𝚎𝚍 𝙿𝚕𝚎𝚊𝚜𝚎 𝚃𝚛𝚢 𝙰𝚐𝚊𝚒𝚗..♥️** \n**Error :** `{str(e)}`")       
-    
-    file_stark = f"{ytdl_data['id']}.mp4"
-    capy = f"""**𝚃𝙸𝚃𝙻𝙴 :** [{thum}]({mo})\n**𝚁𝙴𝚀𝚄𝙴𝚂𝚃𝙴𝙳 𝙱𝚈 :** {message.from_user.mention}"""
 
-    await client.send_video(
-        message.chat.id,
-        video=open(file_stark, "rb"),
-        duration=int(ytdl_data["duration"]),
-        file_name=str(ytdl_data["title"]),
-        thumb=sedlyf,
-        caption=capy,
-        supports_streaming=True,        
-        reply_to_message_id=message.id 
-    )
-    await pablo.delete()
-    for files in (sedlyf, file_stark):
-        if files and os.path.exists(files):
-            os.remove(files)
+    try:
+        with YoutubeDL(ydl_opts) as ydl:
+            ytdl_data = ydl.extract_info(video_link, download=True)
+            video_file = f"{ytdl_data['id']}.mp4"
+
+        caption = f"""🎞️ **TITLE:** [{video_title}]({video_link})\n👤 **Requested by:** {message.from_user.mention}"""
+
+        await client.send_video(
+            chat_id=message.chat.id,
+            video=open(video_file, "rb"),
+            duration=int(ytdl_data.get("duration", 0)),
+            file_name=ytdl_data.get("title", "video.mp4"),
+            thumb=thumb_file,
+            caption=caption,
+            supports_streaming=True,
+            reply_to_message_id=message.id
+        )
+        await info_msg.delete()
+    except Exception as e:
+        print("Video error:", e)
+        await info_msg.edit(f"❌ Download failed.\n**Error:** `{str(e)}`")
+    finally:
+        for f in (video_file, thumb_file):
+            if os.path.exists(f):
+                os.remove(f)
