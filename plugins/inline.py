@@ -8,7 +8,7 @@ from info import CACHE_TIME, AUTH_USERS, AUTH_CHANNEL, AUTH_CHANNEL2 CUSTOM_FILE
 from database.connections_mdb import active_connection
 
 logger = logging.getLogger(__name__)
-cache_time = 0 if AUTH_USERS or AUTH_CHANNEL else CACHE_TIME
+cache_time = 0 if AUTH_USERS or AUTH_CHANNEL or AUTH_CHANNEL2 else CACHE_TIME
 
 async def inline_users(query: InlineQuery):
     if AUTH_USERS:
