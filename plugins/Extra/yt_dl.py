@@ -23,7 +23,7 @@ async def song(client, message):
     m = await message.reply(f"🎧 Searching your song...\n**Query:** `{query}`")
     ydl_opts = {
     "format": "bestaudio[ext=m4a]",
-    "cookiefile": None,
+    "cookiefile": "cookies.txt",  # <-- here
     "quiet": True,
     "geo_bypass": True,
 }
@@ -106,7 +106,7 @@ async def vsong(client, message: Message):
 
     ydl_opts = {
     "format": "best",
-    "cookiefile": None,
+    "cookiefile": "cookies.txt",  # <-- here
     "addmetadata": True,
     "key": "FFmpegMetadata",
     "prefer_ffmpeg": True,
@@ -116,7 +116,6 @@ async def vsong(client, message: Message):
     "outtmpl": "%(id)s.%(ext)s",
     "quiet": True,
 }
-
 
     try:
         with YoutubeDL(ydl_opts) as ydl:
