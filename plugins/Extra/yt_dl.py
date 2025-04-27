@@ -21,7 +21,10 @@ async def song(client, message):
         return await message.reply("Example: `/song Vaathi Coming`")
     
     m = await message.reply(f"🎧 Searching your song...\n**Query:** `{query}`")
-    ydl_opts = {"format": "bestaudio[ext=m4a]"}
+    ydl_opts = {
+    "format": "bestaudio[ext=m4a]",
+    "cookiesfrombrowser": ("chrome",),  # or ("firefox",) if you use Firefox
+}
     try:
         results = YoutubeSearch(query, max_results=1).to_dict()
         result = results[0]
@@ -99,16 +102,17 @@ async def vsong(client, message: Message):
     await asyncio.sleep(0.5)
 
     ydl_opts = {
-        "format": "best",
-        "addmetadata": True,
-        "key": "FFmpegMetadata",
-        "prefer_ffmpeg": True,
-        "geo_bypass": True,
-        "nocheckcertificate": True,
-        "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}],
-        "outtmpl": "%(id)s.%(ext)s",
-        "quiet": True,
-    }
+    "format": "best",
+    "cookiesfrombrowser": ("chrome",),  # <-- this line is new
+    "addmetadata": True,
+    "key": "FFmpegMetadata",
+    "prefer_ffmpeg": True,
+    "geo_bypass": True,
+    "nocheckcertificate": True,
+    "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}],
+    "outtmpl": "%(id)s.%(ext)s",
+    "quiet": True,
+}
 
     try:
         with YoutubeDL(ydl_opts) as ydl:
