@@ -23,7 +23,7 @@ async def song(client, message):
     
     ydl_opts = {
         "format": "bestaudio[ext=m4a]",
-        "cookiefile": "ytcookies.txt",  # Ensure this file exists and is valid
+        "cookiefile": "mycookies.txt",  # Ensure this file exists and is valid
         "quiet": True,
         "geo_bypass": True,
         "socket_timeout": 60,  # Increased timeout to 60 seconds
@@ -108,7 +108,7 @@ async def vsong(client, message: Message):
 
     ydl_opts = {
         "format": "best",
-        "cookiefile": "ytcookies.txt",  # Ensure cookie file is valid
+        "cookiefile": "mycookies.txt",  # Ensure cookie file is valid
         "addmetadata": True,
         "key": "FFmpegMetadata",
         "prefer_ffmpeg": True,
